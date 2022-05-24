@@ -1,31 +1,18 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { UserService } from './user.service';
 
+describe('userService', () => {
+  let userService: UserService;
 
-describe('StudentService', () => {
-  let studentService: UserService;
-
-  beforeEach(async () => {
-    const ApiServiceProvider = {
-      provide: ApiService,
-      useClass: ApiServiceMock,
-    };
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [UserService, ApiServiceProvider],
-    }).compile();
-
-    studentService = module.get<UserService>(UserService);
+  beforeEach(() => {
+    userService = new UserService();
   });
 
-  it('StudentService - should be defined', () => {
-    expect(UserService).toBeDefined();
-  });
+  describe('findAll', () => {
+    it('should return an array of users', async () => {
+      const result = ['test'];
+      jest.spyOn(userService, 'findAll').mockImplementation(() => result);
 
-  describe('getUser', () => {
-    it('should get User info', async () => {
-      const expectedGpa = 3.8;
-      const gpa = await userService.getGpa('Jane', 'Doe');
-      expect(gpa).toEqual(expectedGpa);
+      expect(await userService.findAll()).toBe(result);
     });
   });
 });

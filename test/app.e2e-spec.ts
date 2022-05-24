@@ -1,64 +1,24 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
-import { AppModule } from 'app.module';
-import { HttpModule, HttpService, INestApplication, } from '@nestjs/common';
-import { UserService } from 'user/user.service';
-import { AxiosResponse } from 'axios';
-import { of } from 'rxjs';
+import { Test } from '@nestjs/testing';
+import { AppModule } from './../src/app.module';
+import { INestApplication } from '@nestjs/common';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
-  let httpService: HttpService;
 
   beforeAll(async () => {
-    const mockAppModule: TestingModule = await Test.createTestingModule({
-      imports: [AppModule, HttpModule],
-      providers: [UserService],
+    const moduleFixture = await Test.createTestingModule({
+      imports: [AppModule],
     }).compile();
 
-    app = mockAppModule.createNestApplication();
-    httpService = mockAppModule.get<HttpService>(HttpService);
+    app = moduleFixture.createNestApplication();
     await app.init();
   });
 
-  it('GET student GPA if API finds the student', async () => {
-    const result: AxiosResponse = {
-      data: {
-        name: 'Jane Doe',
-        grades: [3.7, 3.8, 3.9, 4.0, 3.6],
-      },
-      status: 200,
-      statusText: 'OK',
-      headers: {},
-      config: {},
-    };
-    jest.spyOn(httpService, 'get').mockImplementationOnce(() => of(result));
-    const expectedGpaString = '3.8';
-    const response = await request(app.getHttpServer())
-      .get('/student/gpa?firstName=Jane&lastName=Doe')
-      .expect(200);
-    expect(response.text).toEqual(expectedGpaString);
-  });
-
-  it('throws error if GET request does not include student name', async () => {
-    return await request(app.getHttpServer())
-      .get('/student/gpa?firstName=&lastName=')
-      .expect(400);
-  });
-
-  it('throws error if API cannot find the student', async () => {
-    const result: AxiosResponse = {
-      data: {},
-      status: 404,
-      statusText: '',
-      headers: {},
-      config: {},
-    };
-
-    jest.spyOn(httpService, 'get').mockImplementationOnce(() => of(result));
-
-    return await request(app.getHttpServer())
-      .get('/student/gpa?firstName=Anna&lastName=Julia')
-      .expect(404);
+  it('/ (GET)', () => {
+    return request(app.getHttpServer())
+      .get('/')
+      .expect(200)
+      .expect('Hello World!');
   });
 });
