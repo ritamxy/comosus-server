@@ -4,6 +4,9 @@ import { PrismaClient } from '@prisma/client';
 
 @Injectable()
 export class UserService {
+  static findAll() {
+    throw new Error('Method not implemented.');
+  }
   prisma = new PrismaClient();
 
   async create(_createUserInput: CreateUserInput) {

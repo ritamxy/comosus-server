@@ -1,24 +1,32 @@
 import * as request from 'supertest';
 import { Test } from '@nestjs/testing';
-import { AppModule } from './../src/app.module';
+import { UserModule } from 'user/user.module';
+import { UserService } from 'user/user.service';
 import { INestApplication } from '@nestjs/common';
 
-describe('AppController (e2e)', () => {
+describe('User', () => {
   let app: INestApplication;
+  const userService = { findAll: () => ['test'] };
 
   beforeAll(async () => {
-    const moduleFixture = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
+    const moduleRef = await Test.createTestingModule({
+      imports: [UserModule],
+    })
+      .overrideProvider(UserService)
+      .useValue(UserService)
+      .compile();
 
-    app = moduleFixture.createNestApplication();
+    app = moduleRef.createNestApplication();
     await app.init();
   });
 
-  it('/ (GET)', () => {
-    return request(app.getHttpServer())
-      .get('/')
-      .expect(200)
-      .expect('Hello World!');
+  it(`/GET`, () => {
+    return request(app.getHttpServer()).get('/').expect(200).expect({
+      data: UserService.findAll(),
+    });
+  });
+
+  afterAll(async () => {
+    await app.close();
   });
 });
